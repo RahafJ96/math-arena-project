@@ -1,78 +1,129 @@
-const { v4: uuidv4 } = require('uuid');
-const games = require('../data/games');
+const db = require('../db/connection');
 
-function generateQuestions(difficulty = 'easy') {
-  const questions = [];
-  const ops = ['+', '-', '*'];
-  for (let i = 0; i < 5; i++) {
-    const a = Math.floor(Math.random() * 10);
-    const b = Math.floor(Math.random() * 10);
-    const op = ops[Math.floor(Math.random() * ops.length)];
-    const q = `${a} ${op} ${b}`;
-    const answer = eval(q);
-    questions.push({ q, answer });
+function generateQuestion(difficulty) {
+  const ops = ['+', '-', '*', '/'];
+  const count = difficulty + 1;
+  let question = '';
+
+  for (let i = 0; i < count; i++) {
+    const num = Math.floor(Math.random() * Math.pow(10, difficulty));
+    question += num;
+    if (i < count - 1) {
+      question += ` ${ops[Math.floor(Math.random() * ops.length)]} `;
+    }
   }
-  return questions;
+
+  return question;
 }
 
-// Start the game
-exports.startGame = (req, res) => {
-  const { username } = req.body;
-  const gameId = uuidv4();
-  const questions = generateQuestions();
 
-  games[gameId] = {
-    id: gameId,
-    players: [{ username, score: 0 }],
-    questions,
-    current: 0,
-    status: 'active'
-  };
 
-  res.status(201).json({ gameId, questions });
+exports.startGame = async (req, res) => {
+  const { name, difficulty } = req.body;
+  const question = generateQuestion(difficulty);
+  const timeStarted = new Date();
+
+  try {
+    const [result] = await db.query(
+      'INSERT INTO games (creator_name, difficulty, question, time_started, ended) VALUES (?, ?, ?, ?, ?)',
+      [name, difficulty, question, timeStarted, false]
+    );
+
+    const gameId = result.insertId;
+
+    await db.query('INSERT INTO players (game_id, name) VALUES (?, ?)', [gameId, name]);
+
+    res.json({
+      message: `Hello ${name}, find your submit API URL below`,
+      submit_url: `/game/${gameId}/submit`,
+      question,
+      time_started: timeStarted
+    });
+  } catch (err) {
+    console.error('Error starting game:', err.message);
+    res.status(500).json({ error: err.message });
+  }
 };
 
-// Join the Game
-exports.joinGame = (req, res) => {
-  const { username } = req.body;
+exports.joinGame = async (req, res) => {
   const { id } = req.params;
-  const game = games[id];
-  if (!game) return res.status(404).json({ message: 'Game not found' });
-  if (game.players.find(p => p.username === username))
-    return res.status(400).json({ message: 'Already joined' });
+  const { name } = req.body;
 
-  game.players.push({ username, score: 0, answers: [] });
-  res.status(200).json({ message: `Player ${username} joined game ${id}` });
+  try {
+    const [games] = await db.query('SELECT * FROM games WHERE id = ?', [id]);
+    if (games.length === 0 || games[0].ended) {
+      return res.status(400).json({ result: 'Game not found or already ended' });
+    }
+
+    await db.query('INSERT INTO players (game_id, name) VALUES (?, ?)', [id, name || 'Guest']);
+
+    res.json({
+      result: `Welcome ${name || 'Guest'}, you're in!`,
+      next_question: {
+        submit_url: `/game/${id}/submit`,
+        question: games[0].question
+      }
+    });
+  } catch (err) {
+    console.error('Error joining game:', err.message);
+    res.status(500).json({ error: err.message });
+  }
 };
 
-// Submit answer
-exports.submitAnswer = (req, res) => {
+exports.submitAnswer = async (req, res) => {
   const { id } = req.params;
-  const { username, answer } = req.body;
-  const game = games[id];
-  if (!game) return res.status(404).json({ message: 'Game not found' });
-  if (game.status !== 'active') return res.status(400).json({ message: 'Game is not active' });
+  const { answer, name } = req.body;
 
-  const player = game.players.find(p => p.username === username);
-  if (!player) return res.status(404).json({ message: 'Player not in game' });
+  try {
+    const [games] = await db.query('SELECT * FROM games WHERE id = ?', [id]);
+    if (games.length === 0) return res.status(404).json({ message: 'Game not found' });
 
-  const currentQ = game.questions[game.current];
-  const correct = currentQ.answer === Number(answer);
-  if (correct) player.score += 1;
-  player.answers.push({ question: currentQ.q, answer, correct });
-  game.current += 1;
+    const game = games[0];
+    const correctAnswer = parseFloat(eval(game.question.replace(/x/g, '*')));
+    const isCorrect = parseFloat(answer) === correctAnswer;
+    const submittedAt = new Date();
+    const timeTaken = (submittedAt - new Date(game.time_started)) / 1000;
 
-  const next = game.questions[game.current];
-  res.status(200).json({ correct, next });
+    await db.query(
+      `INSERT INTO submissions 
+       (game_id, player_name, question, submitted_answer, correct_answer, is_correct, time_taken, submitted_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [id, name, game.question, answer, correctAnswer, isCorrect, timeTaken, submittedAt]
+    );
+
+    const nextQuestion = generateQuestion(game.difficulty);
+    await db.query('UPDATE games SET question = ? WHERE id = ?', [nextQuestion, id]);
+
+    const [scores] = await db.query(
+      'SELECT COUNT(*) AS total, SUM(is_correct) AS correct FROM submissions WHERE game_id = ? AND player_name = ?',
+      [id, name]
+    );
+    const { total, correct } = scores[0];
+
+    res.json({
+      result: isCorrect
+        ? `Correct, ${name}!`
+        : `Wrong answer, ${name}.`,
+      time_taken: timeTaken,
+      current_score: `${correct || 0}/${total || 0}`,
+      next_question: {
+        submit_url: `/game/${id}/submit`,
+        question: nextQuestion
+      }
+    });
+  } catch (err) {
+    console.error('Error in submit:', err.message);
+    res.status(500).json({ error: err.message });
+  }
 };
-
-// End Game
-exports.endGame = (req, res) => {
+exports.endGame = async (req, res) => {
   const { id } = req.params;
-  const game = games[id];
-  if (!game) return res.status(404).json({ message: 'Game not found' });
-  game.status = 'ended';
 
-  const results = game.players.map(p => ({ username: p.username, score: p.score }));
-  res.status(200).json({ gameId: id, results });
+  try {
+    await db.query('UPDATE games SET ended = ? WHERE id = ?', [true, id]);
+    res.json({ message: 'Game ended successfully.' });
+  } catch (err) {
+    console.error('Error ending game:', err.message);
+    res.status(500).json({ error: err.message });
+  }
 };
