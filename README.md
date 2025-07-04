@@ -205,10 +205,23 @@ CREATE TABLE IF NOT EXISTS submissions (
    GET /result/me/2?player_name=Rahaf
    res:
    {
-    "player": "rahaf",
-    "total_submitted": 1,
-    "total_correct": "1",
-    "total_time": "224.51"
+    "name": "rahaf",
+    "difficulty": 1,
+    "current_score": "1/1",
+    "total_time_spent": 224.51,
+    "best_score": {
+        "question": "9 - 3",
+        "answer": 6,
+        "time_taken": 224.507
+    },
+    "history": [
+        {
+            "question": "9 - 3",
+            "answer": 6,
+            "correct": true,
+            "time_taken": 224.507
+        }
+    ]
    }
    ```
 
@@ -218,13 +231,22 @@ CREATE TABLE IF NOT EXISTS submissions (
    GET /player/all/2
    res:
    {
-    "game_id": "2",
-    "players": [
+    "difficulty": 1,
+    "winners": [
+        "Rahaf"
+    ],
+    "best_score": {
+        "player_name": "Rahaf",
+        "question": "9 - 3",
+        "answer": 6,
+        "time_taken": 224.507
+    },
+    "scores": [
         {
-            "player_name": "Rahaf",
+            "player": "Rahaf",
+            "total_correct": 1,
             "total_submitted": 1,
-            "total_correct": "1",
-            "total_time": 224.5070037841797
+            "total_time": 224.51
         }
     ]
    }

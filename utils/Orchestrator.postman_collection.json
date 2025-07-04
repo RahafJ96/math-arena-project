@@ -185,7 +185,7 @@
 			"response": []
 		},
 		{
-			"name": "New Request Copy",
+			"name": "player result",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -212,7 +212,7 @@
 			"response": []
 		},
 		{
-			"name": "New Request Copy",
+			"name": "game result",
 			"request": {
 				"method": "GET",
 				"header": [],
