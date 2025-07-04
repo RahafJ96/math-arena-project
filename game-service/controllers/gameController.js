@@ -81,7 +81,7 @@ exports.joinGame = async (req, res) => {
 
 exports.submitAnswer = async (req, res) => {
   const { id } = req.params;
-  const { answer, name } = req.body;
+  const { answer, player_name } = req.body;
 
   try {
     const [games] = await db.query("SELECT * FROM games WHERE id = ?", [id]);
@@ -100,7 +100,7 @@ exports.submitAnswer = async (req, res) => {
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
-        name,
+        player_name,
         game.question,
         answer,
         correctAnswer,
@@ -118,14 +118,14 @@ exports.submitAnswer = async (req, res) => {
 
     const [scores] = await db.query(
       "SELECT COUNT(*) AS total, SUM(is_correct) AS correct FROM submissions WHERE game_id = ? AND player_name = ?",
-      [id, name]
+      [id, player_name]
     );
     const { total, correct } = scores[0];
 
     return res.json({
       result: isCorrect
-        ? `Good job ${name}, your answer is correct!`
-        : `Sorry ${name}, your answer is incorrect.`,
+        ? `Good job ${player_name}, your answer is correct!`
+        : `Sorry ${player_name}, your answer is incorrect.`,
       time_taken: timeTaken,
       current_score: `${correct || 0}/${total || 0}`,
       next_question: {
