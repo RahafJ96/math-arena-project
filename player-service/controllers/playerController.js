@@ -1,4 +1,4 @@
-const db = require('../db/connection');
+const db = require("../db/connection");
 
 // GET my result
 exports.getMyResult = async (req, res) => {
@@ -22,7 +22,7 @@ exports.getMyResult = async (req, res) => {
       player: playerName,
       total_submitted: results[0].total_submitted,
       total_correct: results[0].total_correct,
-      total_time: results[0].total_time.toFixed(2)
+      total_time: results[0].total_time.toFixed(2),
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -42,12 +42,13 @@ exports.getAllPlayers = async (req, res) => {
        FROM submissions
        WHERE game_id = ?
        GROUP BY player_name
-       ORDER BY total_correct DESC, total_time ASC`
-      , [gameId]);
+       ORDER BY total_correct DESC, total_time ASC`,
+      [gameId]
+    );
 
     res.json({
       game_id: gameId,
-      players: rows
+      players: rows,
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
