@@ -76,6 +76,75 @@ CREATE TABLE IF NOT EXISTS submissions (
 );
 ```
 
+## 📊 Setup Instructions (README.md)
+
+1. **Clone the project**:
+
+```bash
+git clone https://github.com/your-name/math-arena-project.git
+cd math-arena-project
+```
+
+2. **Install dependencies for each microservice**:
+
+```bash
+cd auth-service && npm install
+cd ../game-service && npm install
+cd ../player-service && npm install
+cd ../orchestrator-service && npm install
+```
+
+3. **Set up `.env` files** (sample below):
+
+```env
+PORT=1000
+DB_HOST=localhost
+DB_USER=root
+DB_PASS=yourpassword
+DB_NAME=math_arena
+```
+
+> Set this for each service accordingly.
+
+4. **Create the database and run the SQL script** shown in the section above.
+
+5. **Run each microservice** in a new terminal window:
+
+```bash
+cd auth-service && node index.js
+cd ../game-service && node index.js
+cd ../player-service && node index.js
+cd ../orchestrator-service && node index.js
+```
+
+or
+
+💡 To avoid opening multiple terminal windows, you can use `start-all.bat`, to **Run All Services at Once**:
+
+a. **Install `concurrently` globally** (if not already):
+
+```bash
+npm install -g concurrently
+```
+
+b. **Create a file named `start-all.bat`** in your root project directory with the following content:
+
+```bat
+concurrently ^
+  "cd auth-service && node index.js" ^
+  "cd game-service && node index.js" ^
+  "cd player-service && node index.js" ^
+  "cd orchestrator-service && node index.js" ^
+```
+
+c. **Run the batch file** by double-clicking it in Explorer or running:
+
+```bash
+start start-all.bat
+```
+
+✅ This will launch all 4 services in parallel using one terminal window. Make sure you have all your `.env` files set and MySQL running.
+
 ## 🌐 API Endpoints via Gateway
 
 ### 🔐 Auth Routes
