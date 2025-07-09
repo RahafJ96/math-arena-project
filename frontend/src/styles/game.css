@@ -1,0 +1,43 @@
+.game-container {
+  max-width: 600px;
+  margin: auto;
+  text-align: center;
+  font-family: "Press Start 2P", cursive;
+  color: #00f7ff;
+  padding: 2rem;
+}
+
+.setup-section input,
+.question-section input,
+select,
+button {
+  font-family: inherit;
+  font-size: 14px;
+  margin: 10px;
+  padding: 10px;
+  background: #222;
+  color: #00f7ff;
+  border: 2px solid #00f7ff;
+  border-radius: 5px;
+}
+
+button:hover {
+  background-color: #00f7ff;
+  color: #000;
+}
+
+.game-message {
+  margin-top: 1rem;
+  font-size: 14px;
+  color: #fff;
+}
+
+.score {
+  margin-top: 0.5rem;
+}
+
+.end-button {
+  margin-top: 20px;
+  background-color: #ff4444;
+  border-color: #ff4444;
+}
