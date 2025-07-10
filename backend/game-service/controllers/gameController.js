@@ -18,7 +18,9 @@ function generateQuestion(difficulty) {
 
 // Start the game
 exports.startGame = async (req, res) => {
-  const { name, difficulty } = req.body;
+  let { name, difficulty } = req.body;
+  difficulty = parseInt(difficulty);
+
   const question = generateQuestion(difficulty);
   const timeStarted = new Date();
 

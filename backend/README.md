@@ -15,7 +15,7 @@ math-arena/
 
 ## 🔧 Microservices
 
-- **Auth Service (4000):** Handles registration and login (with JWT)
+- **Auth Service (4000):** Handles registration and login
 - **Game Service (5000):** Handles game logic (start, join, submit, end)
 - **Player Service (2000):** Shows results for players
 
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS submissions (
 );
 ```
 
-## 📊 Setup Instructions (README.md)
+## 📊 Setup Instructions
 
 1. **Clone the project**:
 
@@ -111,10 +111,10 @@ DB_NAME=math_arena
 5. **Run each microservice** in a new terminal window:
 
 ```bash
-cd auth-service && node index.js
-cd ../game-service && node index.js
-cd ../player-service && node index.js
-cd ../orchestrator-service && node index.js
+cd auth-service && node server.js
+cd ../game-service && node server.js
+cd ../player-service && node server.js
+cd ../orchestrator-service && node server.js
 ```
 
 or
@@ -131,10 +131,10 @@ b. **Create a file named `start-all.bat`** in your root project directory with t
 
 ```bat
 concurrently ^
-  "cd auth-service && node index.js" ^
-  "cd game-service && node index.js" ^
-  "cd player-service && node index.js" ^
-  "cd orchestrator-service && node index.js" ^
+  "cd auth-service && node server.js" ^
+  "cd game-service && node server.js" ^
+  "cd player-service && node server.js" ^
+  "cd orchestrator-service && node server.js" ^
 ```
 
 c. **Run the batch file** by double-clicking it in Explorer or running:

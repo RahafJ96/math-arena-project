@@ -16,4 +16,6 @@ app.use("/game", gameRoutes);
 app.use(cors());
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Game service running on port ${PORT}`));
+app.listen(PORT, () =>
+  console.log("\x1b[33m%s\x1b[0m", `Game service running on port ${PORT} 🎮`)
+);
