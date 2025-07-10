@@ -49,6 +49,7 @@ exports.startGame = async (req, res) => {
   }
 };
 
+// Join Game
 exports.joinGame = async (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
@@ -81,6 +82,7 @@ exports.joinGame = async (req, res) => {
   }
 };
 
+// Submit answer
 exports.submitAnswer = async (req, res) => {
   const { id } = req.params;
   const { answer, player_name } = req.body;
@@ -140,6 +142,8 @@ exports.submitAnswer = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// End Game
 exports.endGame = async (req, res) => {
   const { id } = req.params;
 

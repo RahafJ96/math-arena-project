@@ -1,5 +1,5 @@
-const mysql = require('mysql2');
-const dotenv = require('dotenv');
+const mysql = require("mysql2");
+const dotenv = require("dotenv");
 dotenv.config();
 
 const connection = mysql.createConnection({
@@ -13,10 +13,10 @@ const db = connection.promise();
 
 async function getUsers() {
   try {
-    const [rows] = await db.query('SELECT * FROM users');
+    const [rows] = await db.query("SELECT * FROM users");
     console.log(rows);
   } catch (err) {
-    console.error('Query error:', err);
+    console.error("Query error:", err);
   }
 }
 getUsers();
