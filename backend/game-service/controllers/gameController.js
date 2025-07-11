@@ -2,6 +2,11 @@ const db = require("../db/connection");
 
 function generateQuestion(difficulty) {
   const ops = ["+", "-", "*", "/"];
+
+  if (difficulty === 0) {
+    difficulty = Math.floor(Math.random() * 4) + 1;
+  }
+
   const count = difficulty + 1;
   let question = "";
 
@@ -69,13 +74,14 @@ exports.joinGame = async (req, res) => {
       name || "Guest",
     ]);
 
-    return res.json({
-      result: `Welcome ${name || "Guest"}, now you can participate!`,
-      next_question: {
-        submit_url: `/game/${id}/submit`,
-        question: game.question,
-      },
-    });
+    if (player_name)
+      return res.json({
+        result: `Welcome ${name || "Guest"}, now you can participate!`,
+        next_question: {
+          submit_url: `/game/${id}/submit`,
+          question: game.question,
+        },
+      });
   } catch (err) {
     console.error("Error joining game:", err.message);
     res.status(500).json({ error: err.message });

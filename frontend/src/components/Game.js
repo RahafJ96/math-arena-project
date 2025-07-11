@@ -78,7 +78,7 @@ function Game() {
 
   return (
     <div className="game-container">
-      <h1>🎮 Math Arena Battle</h1>
+      <h1>🎮 Math Arena</h1>
 
       {!question && !gameEnded && (
         <div className="setup-section">
@@ -94,6 +94,7 @@ function Game() {
             <option value={1}>Easy</option>
             <option value={2}>Medium</option>
             <option value={3}>Hard</option>
+            <option value={4}>Extreme</option>
           </select>
           <button onClick={startGame}>Start Game 🚀</button>
         </div>
@@ -135,7 +136,7 @@ function Game() {
             <div className="player-results">
               <h3>📈 Your Performance Summary</h3>
               <p>🧠 Difficulty: {playerStats.difficulty}</p>
-              <p>🕐 Time Spent: {playerStats.total_time_spent.toFixed(2)}s</p>
+              <p>🕐 Time Spent: {playerStats.total_time_spent?.toFixed(2)}s</p>
               <p>
                 🏅 Best Score: {playerStats.best_score?.question} ={" "}
                 {playerStats.best_score?.answer} in{" "}
@@ -144,13 +145,15 @@ function Game() {
 
               <h4>📜 Answer History:</h4>
               <ul>
-                {playerStats.history.map((entry, idx) => (
-                  <li key={idx}>
-                    {entry.question} = {entry.answer} —{" "}
-                    {entry.correct ? "✅" : "❌"} ({entry.time_taken.toFixed(2)}
-                    s)
-                  </li>
-                ))}
+                {playerStats &&
+                  playerStats.history?.map((entry, idx) => (
+                    <li key={idx}>
+                      {entry?.question} = {entry?.answer} —{" "}
+                      {entry?.correct ? "✅" : "❌"} (
+                      {entry?.time_taken?.toFixed(2)}
+                      s)
+                    </li>
+                  ))}
               </ul>
             </div>
           )}
